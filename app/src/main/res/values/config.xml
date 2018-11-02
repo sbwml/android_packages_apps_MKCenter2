@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2018 The MoKee Open Source Project
+
+     This program is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Server Interface Config -->
+    <string name="conf_fetch_full_update_url_def" translatable="false">https://ota.mokeedev.com/full.php</string>
+    <string name="conf_fetch_ota_update_url_def" translatable="false">https://ota.mokeedev.com/ota.php</string>
+    <string name="conf_fetch_donation_ranking_url_def" translatable="false">https://cloud.mokeedev.com/api/rankingByUserIDv3</string>
+
+    <!-- Google Mobile Ads -->
+    <string name="app_id" translatable="false">ca-app-pub-1229799408538170~5022945496</string>
+    <string name="banner_ad_unit_id" translatable="false">ca-app-pub-1229799408538170/6499678696</string>
+    <string name="interstitial_ad_unit_id" translatable="false">ca-app-pub-1229799408538170/2292662299</string>
+</resources>
