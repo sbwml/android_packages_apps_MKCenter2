@@ -28,6 +28,7 @@
     <string name="action_restore">Restore</string>
     <string name="action_donation">Donation</string>
     <string name="action_unlock_features">Unlock Features</string>
+    <string name="action_refresh">Refresh</string>
 
     <!-- Nav Main -->
     <string name="nav_main_forum_title">Forum</string>
@@ -47,7 +48,7 @@
     <string name="mokee_information_title">Version Info</string>
     <string name="mokee_version_title">MoKee Version</string>
     <string name="unique_id_title">Unique ID</string>
-    <string name="last_check_time_title">Last check</string>
+    <string name="last_update_check_title">Last check</string>
     <string name="update_settings_title">Update Settings</string>
     <string name="incremental_updates_title">Incremental updates</string>
     <string name="incremental_updates_summary">Get incremental updates to save download time and bandwidth</string>
@@ -67,7 +68,6 @@
     <string name="update_type_experimental">Experimental</string>
     <string name="update_type_nightly">Nightly</string>
     <string name="update_type_unofficial">Unofficial</string>
-    <string name="update_type_all">All</string>
 
     <!-- Donation Info -->
     <string name="donation_record_title">Donation record</string>
@@ -94,4 +94,6 @@
     <string name="next">Next</string>
     <string name="activity_not_found">App isn\'t installed.</string>
     <string name="payment_not_found">MoKee Payment isn\'t installed.</string>
+    <string name="new_updates_channel_title">New updates</string>
+    <string name="new_updates_found_title">New system updates</string>
 </resources>

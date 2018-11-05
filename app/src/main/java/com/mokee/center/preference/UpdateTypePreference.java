@@ -21,11 +21,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.support.v7.preference.ListPreference;
-import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 
 import com.mokee.center.R;
-import com.mokee.center.misc.Constants;
 import com.mokee.center.util.CommonUtils;
 
 import static com.mokee.center.misc.Constants.PREF_UPDATE_TYPE;
@@ -43,15 +41,20 @@ public class UpdateTypePreference extends ListPreference {
     public void onAttached() {
         super.onAttached();
         Resources resources = getContext().getResources();
-        int suggestUpdateType = CommonUtils.getCurrentVersionType();
-        if (suggestUpdateType == 3) {
+
+        // Reset update type
+        String suggestUpdateType = CommonUtils.getSuggestUpdateType();
+        String configUpdateType = mMainPrefs.getString(PREF_UPDATE_TYPE, String.valueOf(suggestUpdateType));
+        if (!suggestUpdateType.equals("3") && configUpdateType.equals("3")) {
+            configUpdateType = String.valueOf(suggestUpdateType);
+        }
+        if (suggestUpdateType.equals("3")) {
             setEntries(resources.getStringArray(R.array.all_type_entries));
             setEntryValues(resources.getStringArray(R.array.all_type_values));
         } else {
             setEntries(resources.getStringArray(R.array.normal_type_entries));
             setEntryValues(resources.getStringArray(R.array.normal_type_values));
         }
-        String configUpdateType = mMainPrefs.getString(PREF_UPDATE_TYPE, String.valueOf(suggestUpdateType));
         setValue(configUpdateType);
         setSummary(getEntries()[findIndexOfValue(configUpdateType)]);
     }

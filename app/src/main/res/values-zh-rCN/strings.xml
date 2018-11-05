@@ -26,6 +26,7 @@
     <string name="action_restore">恢复授权</string>
     <string name="action_donation">捐赠</string>
     <string name="action_unlock_features">功能解锁</string>
+    <string name="action_refresh">刷新</string>
     <!-- Nav Main -->
     <string name="nav_main_forum_title">魔趣论坛</string>
     <string name="nav_main_source_title">开源代码</string>
@@ -43,7 +44,7 @@
     <string name="mokee_information_title">版本信息</string>
     <string name="mokee_version_title">魔趣版本</string>
     <string name="unique_id_title">设备标识</string>
-    <string name="last_check_time_title">最后检查</string>
+    <string name="last_update_check_title">最后检查</string>
     <string name="update_settings_title">更新设置</string>
     <string name="incremental_updates_title">增量更新</string>
     <string name="incremental_updates_summary">为您节省时间和流量，随时随地轻松升级</string>
@@ -64,7 +65,6 @@
     <string name="update_type_experimental">测试版</string>
     <string name="update_type_nightly">每夜版</string>
     <string name="update_type_unofficial">适配版</string>
-    <string name="update_type_all">全部</string>
 
     <!-- Donation Info -->
     <string name="donation_record_title">捐赠记录</string>
@@ -92,4 +92,6 @@
     <string name="next">下一步</string>
     <string name="activity_not_found">未安装该应用。</string>
     <string name="payment_not_found">未安装魔趣支付应用。</string>
+    <string name="new_updates_channel_title">新的系统更新</string>
+    <string name="new_updates_found_title">新的系统更新</string>
 </resources>

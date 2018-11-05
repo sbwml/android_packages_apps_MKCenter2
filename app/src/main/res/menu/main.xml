@@ -24,8 +24,15 @@
         app:showAsAction="always|withText" />
 
     <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_menu_refresh"
+        android:title="@string/action_refresh"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_restore"
         android:title="@string/action_restore" />
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

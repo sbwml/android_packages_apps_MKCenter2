@@ -21,23 +21,52 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 
 import com.mokee.center.MKCenterApplication;
 import com.mokee.center.misc.Constants;
+import com.mokee.center.misc.State;
 import com.mokee.center.model.DonationInfo;
+import com.mokee.center.model.UpdateInfo;
 import com.mokee.os.Build;
 import com.mokee.security.License;
 import com.mokee.security.LicenseInfo;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static com.mokee.center.misc.Constants.ACTION_PAYMENT_REQUEST;
 
 public class CommonUtils {
+
+    public static File getCachedUpdateList(Context context) {
+        return new File(context.getCacheDir(), "updates.state");
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        return info != null && info.isConnected();
+    }
+
+    public static File getDownloadPath(Context context) {
+        return new File(Environment.getExternalStorageDirectory(), "mokee_updates");
+    }
 
     public static void openLink(Context context, String url) {
         Uri uri = Uri.parse(url);
@@ -70,16 +99,14 @@ public class CommonUtils {
         return 0f;
     }
 
-    public static int getCurrentVersionType() {
+    public static String getSuggestUpdateType() {
         switch (Build.RELEASE_TYPE.toLowerCase(Locale.ENGLISH)) {
-            case "nightly":
-                return 1;
-            case "experimental":
-                return 2;
+            case "release":
+                return "0";
             case "unofficial":
-                return 3;
+                return "3";
             default:
-                return 0;
+                return "1";
         }
     }
 
@@ -96,6 +123,55 @@ public class CommonUtils {
     public static void restoreLicenseRequest(Activity context) {
         Intent intent = new Intent(Constants.ACTION_RESTORE_REQUEST);
         context.startActivityForResult(intent, 0);
+    }
+
+    public static boolean checkForNewUpdates(File oldJson, File newJson) {
+        List<UpdateInfo> oldList = State.loadState(oldJson);
+        List<UpdateInfo> newList = State.loadState(newJson);
+        Set<String> oldUpdates = new HashSet<>();
+        for (UpdateInfo update : oldList) {
+            oldUpdates.add(update.getName());
+        }
+        // In case of no new updates, the old list should
+        // have all (if not more) the updates
+        for (UpdateInfo update : newList) {
+            if (!oldUpdates.contains(update.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static LinkedList<UpdateInfo> parseJson(String json, String tag)
+            throws JSONException {
+        LinkedList<UpdateInfo> updates = new LinkedList<>();
+        JSONArray updatesList = new JSONArray(json);
+        for (int i = 0; i < updatesList.length(); i++) {
+            if (updatesList.isNull(i)) {
+                continue;
+            }
+            try {
+                UpdateInfo updateInfo = parseJsonUpdate(updatesList.getJSONObject(i));
+                if (updateInfo != null) {
+                    updates.add(updateInfo);
+                }
+            } catch (JSONException e) {
+                Log.e(tag, "Could not parse update object, index=" + i, e);
+            }
+        }
+        return updates;
+    }
+
+    private static UpdateInfo parseJsonUpdate(JSONObject object) throws JSONException {
+        UpdateInfo updateInfo = new UpdateInfo.Builder()
+                .setName(object.getString("name"))
+                .setMD5Sum(object.getString("md5"))
+                .setDiffSize(object.getLong("diff"))
+                .setFileSize(object.getLong("length"))
+                .setTimestamp(object.getLong("timestamp"))
+                .setDownloadUrl(object.getString("rom"))
+                .setChangelogUrl(object.getString("log")).build();
+        return updateInfo;
     }
 
     public static SharedPreferences getDonationPrefs(Context context) {

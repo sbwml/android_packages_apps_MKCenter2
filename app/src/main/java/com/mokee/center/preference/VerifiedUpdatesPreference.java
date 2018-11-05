@@ -44,7 +44,7 @@ public class VerifiedUpdatesPreference extends SwitchPreference {
     public void updateStatus() {
         DonationInfo donationInfo = MKCenterApplication.getInstance().getDonationInfo();
         setEnabled(donationInfo.isAdvanced());
-        if(!isEnabled()) {
+        if (!isEnabled()) {
             if (donationInfo.getPaid() == 0f) {
                 setSummary(TextUtils.join(" ", Arrays.asList(getContext().getString(R.string.verified_updates_summary),
                         getContext().getString(R.string.unlock_features_request_summary, DONATION_ADVANCED))));

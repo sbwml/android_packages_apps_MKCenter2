@@ -19,8 +19,12 @@ package com.mokee.center;
 
 import android.app.Application;
 
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.model.HttpHeaders;
 import com.mokee.center.model.DonationInfo;
 import com.mokee.center.util.CommonUtils;
+
+import static com.mokee.center.misc.Constants.USER_AGENT;
 
 public class MKCenterApplication extends Application {
 
@@ -41,6 +45,10 @@ public class MKCenterApplication extends Application {
         super.onCreate();
         mApp = this;
         CommonUtils.updateDonationInfo(this);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.put("User-Agent", USER_AGENT);
+        OkGo.getInstance().init(this).addCommonHeaders(httpHeaders);
     }
 
 }

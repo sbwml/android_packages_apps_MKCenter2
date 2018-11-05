@@ -23,17 +23,24 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Response;
 import com.mokee.center.MKCenterApplication;
 import com.mokee.center.R;
 import com.mokee.center.preference.DonationRecordPreference;
 import com.mokee.center.preference.IncrementalUpdatesPreference;
 import com.mokee.center.preference.VerifiedUpdatesPreference;
 import com.mokee.center.util.CommonUtils;
+import com.mokee.center.util.RequestUtils;
 
 import static com.mokee.center.misc.Constants.DONATION_RESULT_OK;
 import static com.mokee.center.misc.Constants.DONATION_RESULT_SUCCESS;
@@ -47,6 +54,9 @@ public class UpdaterFragment extends PreferenceFragmentCompat implements SharedP
     private SharedPreferences mDonationPrefs;
 
     private InterstitialAd mWelcomeInterstitialAd;
+
+    private View mRefreshIconView;
+    private RotateAnimation mRefreshAnimation;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +75,11 @@ public class UpdaterFragment extends PreferenceFragmentCompat implements SharedP
             });
             mWelcomeInterstitialAd.loadAd(adRequest);
         }
+
+        mRefreshAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f);
+        mRefreshAnimation.setInterpolator(new LinearInterpolator());
+        mRefreshAnimation.setDuration(1000);
     }
 
     @Override
@@ -88,8 +103,8 @@ public class UpdaterFragment extends PreferenceFragmentCompat implements SharedP
             case DONATION_RESULT_SUCCESS:
                 CommonUtils.updateDonationInfo(getContext());
                 ((DonationRecordPreference) findPreference(PREF_DONATION_RECORD)).updateRankInfo();
-                ((IncrementalUpdatesPreference)findPreference(PREF_INCREMENTAL_UPDATES)).updateStatus();
-                ((VerifiedUpdatesPreference)findPreference(PREF_VERIFIED_UPDATES)).updateStatus();
+                ((IncrementalUpdatesPreference) findPreference(PREF_INCREMENTAL_UPDATES)).updateStatus();
+                ((VerifiedUpdatesPreference) findPreference(PREF_VERIFIED_UPDATES)).updateStatus();
                 break;
         }
     }
@@ -97,11 +112,47 @@ public class UpdaterFragment extends PreferenceFragmentCompat implements SharedP
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_refresh:
+                downloadUpdatesList();
+                return true;
             case R.id.action_restore:
                 CommonUtils.restoreLicenseRequest(getActivity());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void downloadUpdatesList() {
+        RequestUtils.fetchAvailableUpdates(getContext(), new StringCallback() {
+            @Override
+            public void onSuccess(Response<String> response) {
+            }
+
+            @Override
+            public void onFinish() {
+                super.onFinish();
+                refreshAnimationStop();
+            }
+        });
+        refreshAnimationStart();
+    }
+
+    private void refreshAnimationStart() {
+        if (mRefreshIconView == null) {
+            mRefreshIconView = getActivity().findViewById(R.id.action_refresh);
+        }
+        if (mRefreshIconView != null) {
+            mRefreshAnimation.setRepeatCount(Animation.INFINITE);
+            mRefreshIconView.startAnimation(mRefreshAnimation);
+            mRefreshIconView.setEnabled(false);
+        }
+    }
+
+    private void refreshAnimationStop() {
+        if (mRefreshIconView != null) {
+            mRefreshAnimation.setRepeatCount(0);
+            mRefreshIconView.setEnabled(true);
         }
     }
 

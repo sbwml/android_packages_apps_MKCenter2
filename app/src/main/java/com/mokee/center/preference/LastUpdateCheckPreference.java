@@ -27,11 +27,11 @@ import com.mokee.center.R;
 import com.mokee.center.misc.Constants;
 import com.mokee.center.util.CommonUtils;
 
-public class LastCheckTimePreference extends Preference {
+public class LastUpdateCheckPreference extends Preference {
 
     private SharedPreferences mMainPrefs;
 
-    public LastCheckTimePreference(Context context, AttributeSet attrs) {
+    public LastUpdateCheckPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         mMainPrefs = CommonUtils.getMainPrefs(context);
     }
@@ -39,7 +39,7 @@ public class LastCheckTimePreference extends Preference {
     @Override
     public void onAttached() {
         super.onAttached();
-        long lastCheckTime = mMainPrefs.getLong(Constants.PREF_LAST_CHECK_TIME, 0);
+        long lastCheckTime = mMainPrefs.getLong(Constants.PREF_LAST_UPDATE_CHECK, 0);
         if (lastCheckTime == 0) {
             setSummary(R.string.never);
         } else {

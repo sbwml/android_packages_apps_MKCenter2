@@ -22,6 +22,8 @@ import android.os.Environment;
 
 public class Constants {
 
+    public static final String USER_AGENT = "com.mokee.center/2.0";
+
     // Actions
     public static final String ACTION_PAYMENT_REQUEST = "com.mokee.pay.action.PAYMENT_REQUEST";
     public static final String ACTION_RESTORE_REQUEST = "com.mokee.pay.action.RESTORE_REQUEST";
@@ -62,13 +64,19 @@ public class Constants {
     public static final String KEY_DONATION_LAST_CHECK_TIME = "last_check_time";
 
     // Prefs
-    public static final String PREF_DONATION_RECORD = "pref_donation_record";
-    public static final String PREF_LAST_CHECK_TIME = "pref_last_check_time";
-    public static final String PREF_UPDATE_TYPE = "pref_update_type";
-    public static final String PREF_VERIFIED_UPDATES = "pref_verified_updates";
-    public static final String PREF_INCREMENTAL_UPDATES= "incremental_updates";
+    public static final String PREF_DONATION_RECORD = "donation_record";
+    public static final String PREF_LAST_UPDATE_CHECK = "last_update_check";
+    public static final String PREF_UPDATE_TYPE = "update_type";
+    public static final String PREF_VERIFIED_UPDATES = "verified_updates";
+    public static final String PREF_INCREMENTAL_UPDATES = "incremental_updates";
+    public static final String PREF_AUTO_UPDATES_CHECK = "auto_updates_check";
 
     // HTTP Params
     public static final String PARAM_UNIQUE_IDS = "user_ids";
+
+    // Request Tags
+    public static final String DONATION_RANKING_TAG = "FetchDonationRanking";
+    public static final String CHANGELOG_TAG = "FetchChangeLog";
+    public static final String AVAILABLE_UPDATES_TAG = "FetchAvailableUpdates";
 
 }
