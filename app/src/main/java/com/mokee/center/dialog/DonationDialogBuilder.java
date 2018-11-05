@@ -55,7 +55,7 @@ public class DonationDialogBuilder extends AlertDialog.Builder {
 
     @Override
     public AlertDialog create() {
-        final ViewGroup donationView = (ViewGroup) LayoutInflater.from(getContext()).inflate(R.layout.donation, null);
+        final ViewGroup donationView = (ViewGroup) LayoutInflater.from(getContext()).inflate(R.layout.dialog_donation, null);
         TextView tips = donationView.findViewById(R.id.tips);
         final SeekBar seekBar = donationView.findViewById(R.id.price);
         final RadioGroup via = donationView.findViewById(R.id.via);

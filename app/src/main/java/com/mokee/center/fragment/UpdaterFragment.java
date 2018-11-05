@@ -24,6 +24,10 @@ import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.MenuItem;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.mokee.center.MKCenterApplication;
 import com.mokee.center.R;
 import com.mokee.center.preference.DonationRecordPreference;
@@ -41,6 +45,27 @@ import static com.mokee.center.misc.Constants.PREF_VERIFIED_UPDATES;
 public class UpdaterFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private SharedPreferences mDonationPrefs;
+
+    private InterstitialAd mWelcomeInterstitialAd;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (!MKCenterApplication.getInstance().getDonationInfo().isAdvanced()) {
+            MobileAds.initialize(getContext(), getString(R.string.app_id));
+            mWelcomeInterstitialAd = new InterstitialAd(getContext());
+            mWelcomeInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id));
+            AdRequest adRequest = new AdRequest.Builder().build();
+            mWelcomeInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    mWelcomeInterstitialAd.show();
+                }
+            });
+            mWelcomeInterstitialAd.loadAd(adRequest);
+        }
+    }
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {

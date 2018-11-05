@@ -47,7 +47,7 @@
     <string name="mokee_information_title">Version Info</string>
     <string name="mokee_version_title">MoKee Version</string>
     <string name="unique_id_title">Unique ID</string>
-    <string name="last_check_time_title">Last Check</string>
+    <string name="last_check_time_title">Last check</string>
     <string name="update_settings_title">Update Settings</string>
     <string name="incremental_updates_title">Incremental updates</string>
     <string name="incremental_updates_summary">Get incremental updates to save download time and bandwidth</string>
@@ -61,7 +61,7 @@
     <string name="unlock_features_request_summary">(available after donating %d CNY)</string>
     <string name="unlock_features_pending_summary">(donated %1$d CNY, available for lifetime after donating %2$d CNY more)</string>
 
-    <string name="update_type_title">Update Type</string>
+    <string name="update_type_title">Update type</string>
     <string name="update_type_release">Release</string>
     <string name="update_type_history">History</string>
     <string name="update_type_experimental">Experimental</string>
@@ -70,7 +70,7 @@
     <string name="update_type_all">All</string>
 
     <!-- Donation Info -->
-    <string name="donation_record_title">Donation Record</string>
+    <string name="donation_record_title">Donation record</string>
     <string name="donation_record_without_rank">You donated a total of %1$d CNY.</string>
     <string name="donation_record_with_rank">You donated a total of %1$d CNY, more than %2$s of donors globally, rank No.%3$d!</string>
     <string name="donation_record_none">You haven\'t donated</string>
