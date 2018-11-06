@@ -57,4 +57,9 @@ public class IncrementalUpdatesPreference extends SwitchPreference {
             setSummary(R.string.incremental_updates_summary);
         }
     }
+
+    @Override
+    public boolean callChangeListener(Object newValue) {
+        return super.callChangeListener(newValue);
+    }
 }

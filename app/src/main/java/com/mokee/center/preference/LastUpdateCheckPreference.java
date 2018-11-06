@@ -36,14 +36,18 @@ public class LastUpdateCheckPreference extends Preference {
         mMainPrefs = CommonUtils.getMainPrefs(context);
     }
 
-    @Override
-    public void onAttached() {
-        super.onAttached();
+    public void updateSummary() {
         long lastCheckTime = mMainPrefs.getLong(Constants.PREF_LAST_UPDATE_CHECK, 0);
         if (lastCheckTime == 0) {
             setSummary(R.string.never);
         } else {
             setSummary(DateUtils.formatDateTime(getContext(), lastCheckTime, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_YEAR));
         }
+    }
+
+    @Override
+    public void onAttached() {
+        super.onAttached();
+        updateSummary();
     }
 }

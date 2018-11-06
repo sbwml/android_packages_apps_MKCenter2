@@ -83,6 +83,8 @@
     <string name="donation_dialog_message">MoKee Open Source is a purely non-profit project born of hobby and passion. In order to maintain this project, we have to fork out our own money most of the time or rely on donations and advertisements. Your donations can help reduce our financial load and sustain future development!</string>
     <string name="donation_dialog_message_extra">This option allows you to unlock some specific features, remove the Google Ads in MoKee Center.</string>
 
+    <string name="updates_check_failed">The update check failed. Please check your internet connection and try again later.</string>
+
     <string name="text_copied">Text copied to clipboard.</string>
     <string name="unknown">Unknown</string>
     <string name="never">Never</string>

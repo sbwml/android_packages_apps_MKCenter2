@@ -134,7 +134,6 @@ public class DonationDialogBuilder extends AlertDialog.Builder {
             } catch (ActivityNotFoundException ex) {
                 mActivity.makeSnackbar(R.string.activity_not_found).show();
             }
-
         });
         return super.create();
     }

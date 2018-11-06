@@ -150,11 +150,9 @@ public class CommonUtils {
             float codeo1 = getReleaseCode(o1.getName());
             float codeo2 = getReleaseCode(o2.getName());
             if (codeo2 - codeo1 == 0) {
-                long dateo1 = getBuildDate(o1.getName());
-                long dateo2 = getBuildDate(o2.getName());
-                return dateo2 < dateo1 ? -1 : 1;
+                return Long.compare(getBuildDate(o2.getName()), getBuildDate(o1.getName()));
             } else {
-                return codeo2 < codeo1 ? -1 : 1;
+                return Float.compare(codeo2, codeo1);
             }
         });
         return updates;

@@ -20,10 +20,10 @@ package com.mokee.center.preference;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
-import android.widget.Toast;
 
 import com.mokee.center.R;
 import com.mokee.os.Build;
@@ -54,7 +54,7 @@ public class UniqueIDPreference extends Preference {
         holder.itemView.setLongClickable(true);
         holder.itemView.setOnLongClickListener(v -> {
             clipboardManager.setPrimaryClip(ClipData.newPlainText(null, getSummary()));
-            Toast.makeText(getContext(), R.string.text_copied, Toast.LENGTH_SHORT).show();
+            Snackbar.make(holder.itemView, R.string.text_copied, Snackbar.LENGTH_SHORT).show();
             return true;
         });
     }

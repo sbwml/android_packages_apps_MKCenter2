@@ -32,7 +32,7 @@ public class MKCenterApplication extends Application {
 
     private DonationInfo mDonationInfo = new DonationInfo();
 
-    public static MKCenterApplication getInstance() {
+    public static synchronized MKCenterApplication getInstance() {
         return mApp;
     }
 
