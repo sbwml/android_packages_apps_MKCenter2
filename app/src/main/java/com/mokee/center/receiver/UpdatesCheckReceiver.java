@@ -56,18 +56,118 @@ public class UpdatesCheckReceiver extends BroadcastReceiver {
     private static final String DAILY_CHECK_ACTION = "daily_check_action";
     private static final String ONESHOT_CHECK_ACTION = "oneshot_check_action";
 
-    private static final String NEW_UPDATES_NOTIFICATION_CHANNEL =
-            "new_updates_notification_channel";
+    private static final String NEW_UPDATES_NOTIFICATION_CHANNEL = "new_updates_notification_channel";
 
-    public static void updateRepeatingUpdatesCheck(Context context) {
-        cancelRepeatingUpdatesCheck(context);
-        scheduleRepeatingUpdatesCheck(context);
+    // max. number of updates listed in the extras notification
+    private static final int EXTRAS_NOTIF_UPDATE_COUNT = 4;
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            //cleanup downloads dir
+        }
+
+        final SharedPreferences mMainPrefs = CommonUtils.getMainPrefs(context);
+        if (!mMainPrefs.getBoolean(PREF_AUTO_UPDATES_CHECK, true)) {
+            return;
+        }
+
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            // Set a repeating alarm on boot to check for new updates once per day
+            scheduleRepeatingUpdatesCheck(context);
+        }
+
+        if (!CommonUtils.isNetworkAvailable(context)) {
+            Log.d(TAG, "Network not available, scheduling new check");
+            scheduleUpdatesCheck(context);
+            return;
+        }
+
+        final File json = CommonUtils.getCachedUpdateList(context);
+        final File jsonNew = new File(json.getAbsolutePath() + UUID.randomUUID());
+        RequestUtils.fetchAvailableUpdates(context, new StringCallback() {
+            @Override
+            public void onSuccess(Response<String> response) {
+                try {
+                    final LinkedList<UpdateInfo> updates = CommonUtils.parseJson(response.body(), TAG);
+                    State.saveState(updates, jsonNew);
+                    if (json.exists() && CommonUtils.checkForNewUpdates(json, jsonNew)) {
+                        showNotification(context, updates);
+                        updateRepeatingUpdatesCheck(context);
+                    }
+                    jsonNew.renameTo(json);
+                    // In case we set a one-shot check because of a previous failure
+                    cancelUpdatesCheck(context);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Could not parse list, scheduling new check", e);
+                    scheduleUpdatesCheck(context);
+                }
+                mMainPrefs.edit().putLong(PREF_LAST_UPDATE_CHECK, System.currentTimeMillis()).apply();
+            }
+
+            @Override
+            public void onError(Response<String> response) {
+                super.onError(response);
+                Log.e(TAG, "Could not download updates list, scheduling new check");
+                scheduleUpdatesCheck(context);
+            }
+        });
+    }
+
+    private static void showNotification(Context context, LinkedList<UpdateInfo> updates) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationChannel notificationChannel = new NotificationChannel(
+                NEW_UPDATES_NOTIFICATION_CHANNEL,
+                context.getString(R.string.new_updates_channel_title),
+                NotificationManager.IMPORTANCE_HIGH);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,
+                NEW_UPDATES_NOTIFICATION_CHANNEL);
+
+        Intent notificationIntent = new Intent(context, MainActivity.class);
+        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String contentText = context.getResources().getQuantityString(
+                R.plurals.new_updates_found_content, updates.size(), updates.size());
+
+        notificationBuilder.setSmallIcon(R.drawable.ic_system_update);
+        notificationBuilder.setContentIntent(intent);
+        notificationBuilder.setContentTitle(context.getString(R.string.new_updates_found_title));
+        notificationBuilder.setContentText(contentText);
+        notificationBuilder.setAutoCancel(true);
+
+        NotificationCompat.InboxStyle inbox = new NotificationCompat.InboxStyle(notificationBuilder).setBigContentTitle(contentText);
+        int added = 0, count = updates.size();
+        for (UpdateInfo update : updates) {
+            if (added < EXTRAS_NOTIF_UPDATE_COUNT) {
+                inbox.addLine(update.getName());
+                added ++;
+            }
+        }
+        if (added != count) {
+            inbox.setSummaryText(context.getResources().getQuantityString(
+                    R.plurals.new_updates_found_additional_count, count - added, count - added));
+        }
+        notificationBuilder.setStyle(inbox);
+        notificationBuilder.setNumber(updates.size());
+
+        if (count == 1) {
+            // Add action here
+        }
+
+        notificationManager.createNotificationChannel(notificationChannel);
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
     private static PendingIntent getRepeatingUpdatesCheckIntent(Context context) {
         Intent intent = new Intent(context, UpdatesCheckReceiver.class);
         intent.setAction(DAILY_CHECK_ACTION);
         return PendingIntent.getBroadcast(context, 0, intent, 0);
+    }
+
+    public static void updateRepeatingUpdatesCheck(Context context) {
+        cancelRepeatingUpdatesCheck(context);
+        scheduleRepeatingUpdatesCheck(context);
     }
 
     public static void scheduleRepeatingUpdatesCheck(Context context) {
@@ -152,78 +252,5 @@ public class UpdatesCheckReceiver extends BroadcastReceiver {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         return millis - c.getTimeInMillis();
-    }
-
-    private static void showNotification(Context context) {
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationChannel notificationChannel = new NotificationChannel(
-                NEW_UPDATES_NOTIFICATION_CHANNEL,
-                context.getString(R.string.new_updates_channel_title),
-                NotificationManager.IMPORTANCE_HIGH);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context,
-                NEW_UPDATES_NOTIFICATION_CHANNEL);
-        notificationBuilder.setSmallIcon(R.drawable.ic_system_update);
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent intent = PendingIntent.getActivity(context, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(intent);
-        notificationBuilder.setContentTitle(context.getString(R.string.new_updates_found_title));
-        notificationBuilder.setAutoCancel(true);
-        notificationManager.createNotificationChannel(notificationChannel);
-        notificationManager.notify(0, notificationBuilder.build());
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            //cleanup downloads dir
-        }
-
-        final SharedPreferences mMainPrefs = CommonUtils.getMainPrefs(context);
-        if (!mMainPrefs.getBoolean(PREF_AUTO_UPDATES_CHECK, true)) {
-            return;
-        }
-
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            // Set a repeating alarm on boot to check for new updates once per day
-            scheduleRepeatingUpdatesCheck(context);
-        }
-
-        if (!CommonUtils.isNetworkAvailable(context)) {
-            Log.d(TAG, "Network not available, scheduling new check");
-            scheduleUpdatesCheck(context);
-            return;
-        }
-
-        final File json = CommonUtils.getCachedUpdateList(context);
-        final File jsonNew = new File(json.getAbsolutePath() + UUID.randomUUID());
-        RequestUtils.fetchAvailableUpdates(context, new StringCallback() {
-            @Override
-            public void onSuccess(Response<String> response) {
-                try {
-                    final LinkedList<UpdateInfo> updates = CommonUtils.parseJson(response.body(), TAG);
-                    State.saveState(updates, jsonNew);
-                    if (json.exists() && CommonUtils.checkForNewUpdates(json, jsonNew)) {
-                        showNotification(context);
-                        updateRepeatingUpdatesCheck(context);
-                    }
-                    jsonNew.renameTo(json);
-                    // In case we set a one-shot check because of a previous failure
-                    cancelUpdatesCheck(context);
-                } catch (JSONException e) {
-                    Log.e(TAG, "Could not parse list, scheduling new check", e);
-                    scheduleUpdatesCheck(context);
-                }
-                mMainPrefs.edit().putLong(PREF_LAST_UPDATE_CHECK, System.currentTimeMillis()).apply();
-            }
-
-            @Override
-            public void onError(Response<String> response) {
-                super.onError(response);
-                Log.e(TAG, "Could not download updates list, scheduling new check");
-                scheduleUpdatesCheck(context);
-            }
-        });
     }
 }

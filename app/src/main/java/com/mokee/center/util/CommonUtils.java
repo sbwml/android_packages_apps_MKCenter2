@@ -26,6 +26,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.mokee.center.MKCenterApplication;
@@ -43,6 +44,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -142,6 +145,51 @@ public class CommonUtils {
         return false;
     }
 
+    public static LinkedList<UpdateInfo> getSortedUpdates(LinkedList<UpdateInfo> updates) {
+        Collections.sort(updates, (o1, o2) -> {
+            float codeo1 = getReleaseCode(o1.getName());
+            float codeo2 = getReleaseCode(o2.getName());
+            if (codeo2 - codeo1 == 0) {
+                long dateo1 = getBuildDate(o1.getName());
+                long dateo2 = getBuildDate(o2.getName());
+                return dateo2 < dateo1 ? -1 : 1;
+            } else {
+                return codeo2 < codeo1 ? -1 : 1;
+            }
+        });
+        return updates;
+    }
+
+    public static long getBuildDate(String version) {
+        String[] info = version.split("-");
+        String date;
+        if (version.toLowerCase(Locale.ENGLISH).startsWith("ota")) {
+            date = info[4];
+        } else {
+            date = info[2];
+        }
+        if (!TextUtils.isDigitsOnly(date)) {
+            return 0;
+        } else {
+            return Long.valueOf(date);
+        }
+    }
+
+    public static float getReleaseCode(String version) {
+        String[] info = version.split("-");
+        String code;
+        if (version.toLowerCase(Locale.ENGLISH).startsWith("ota")) {
+            code = info[1];
+        } else {
+            code = info[0];
+        }
+        if (!code.toLowerCase(Locale.ENGLISH).startsWith("mk")) {
+            return 0;
+        } else {
+            return Float.valueOf(code.substring(2, code.length()));
+        }
+    }
+
     public static LinkedList<UpdateInfo> parseJson(String json, String tag)
             throws JSONException {
         LinkedList<UpdateInfo> updates = new LinkedList<>();
@@ -159,7 +207,7 @@ public class CommonUtils {
                 Log.e(tag, "Could not parse update object, index=" + i, e);
             }
         }
-        return updates;
+        return CommonUtils.getSortedUpdates(updates);
     }
 
     private static UpdateInfo parseJsonUpdate(JSONObject object) throws JSONException {
